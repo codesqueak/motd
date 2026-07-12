@@ -18,7 +18,6 @@ ghcr.io/codesqueak/motd:a3f9c12
 
 - Every push to `main` produces a unique tag — no manual tagging required
 - Tags are immutable; the same SHA always refers to the same image
-- ArgoCD Image Updater can detect new tags and trigger automatic deployments
 - Any deployed image can be traced back to its exact source commit
 
 ## Release workflow
@@ -29,6 +28,14 @@ Every push to `main` triggers the build pipeline, which:
 2. Builds the container image
 3. Tags it with the short commit SHA
 4. Pushes it to GHCR
+5. Clones the `codesqueak/gitops` repo, updates the image tag in
+   `gitops-repo/environments/dev/motd-values.yaml`, and commits/pushes that change
+
+There's no ArgoCD Image Updater or registry-watching component involved - the CI workflow itself writes
+the new tag directly into the gitops repo. ArgoCD's `motd-dev` Application then picks that commit up via
+its normal git polling plus `selfHeal`, and rolls the new image out. See
+[install-motd.md](https://github.com/codesqueak/gitops/blob/main/install-motd.md) in the gitops repo for
+the full pipeline.
 
 No manual tagging or version management is required.
 
