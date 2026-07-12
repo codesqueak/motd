@@ -1,0 +1,66 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '4.0.7'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'pl.allegro.tech.build.axion-release' version '1.21.2'
+}
+
+group = 'com.codingrodent.gitops'
+version = project.hasProperty('buildNumber')
+    ? scmVersion.version.replace('-SNAPSHOT', "-${project.buildNumber}")
+    : scmVersion.version
+
+tasks.named("bootJar") {
+    layered {
+        enabled = true
+    }
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-opentelemetry'
+    implementation 'net.logstash.logback:logstash-logback-encoder:9.0'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2'
+    testImplementation 'org.springframework.boot:spring-boot-starter-validation-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+/**
+ * BUILD PACK CONFIGURATION
+ */
+bootBuildImage {
+    // Pick a stable Ubuntu Jammy-based builder
+    builder = "paketobuildpacks/builder-jammy-base"
+
+    // Runtime image (equivalent to a base JRE image like eclipse-temurin)
+    runImage = "paketobuildpacks/run-jammy-base"
+
+    // Force Java version inside the image
+    environment = [
+            "BP_JVM_VERSION"            : "25",
+            "BP_JVM_TYPE"               : "JRE",
+            "BP_JVM_CDS_ENABLED"        : "false",
+            "BPL_JVM_HEAD_ROOM"         : "10",
+    //        "BPL_JVM_LOADED_CLASS_COUNT": "40"
+
+    ]
+
+    // Optional: helpful for GitOps traceability
+    imageName = "${project.group}/${project.name}:${project.version}"
+}
