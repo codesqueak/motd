@@ -41,4 +41,4 @@ No manual tagging or version management is required.
 
 ## Gradle version
 
-The project still uses the [axion-release-plugin](https://github.com/allegro/axion-release-plugin) for the Gradle build version (JAR filename etc.), but this is decoupled from the container image tag. The container image tag is always the commit SHA.
+The project still uses the [axion-release-plugin](https://github.com/allegro/axion-release-plugin) for the Gradle build version (JAR filename etc.) for the humans in the loop, but this is decoupled from the container image tag. The container image tag is always the commit SHA.

@@ -2,6 +2,9 @@
 
 # Message Of The Day - Simple Test Service
 
+This is the MOTD service used in the gitops demonstrator project 
+
+Manual build ...
 ```bash
 ./gradlew clean build test  bootBuildImage
 ```
